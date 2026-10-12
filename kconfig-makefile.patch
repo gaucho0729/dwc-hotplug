@@ -1,0 +1,35 @@
+diff --git a/drivers/pci/controller/dwc/Kconfig b/drivers/pci/controller/dwc/Kconfig
+index bc049865f..51858973e 100644
+--- a/drivers/pci/controller/dwc/Kconfig
++++ b/drivers/pci/controller/dwc/Kconfig
+@@ -53,6 +53,18 @@ config PCI_DRA7XX_EP
+ config PCIE_DW_PLAT
+ 	bool
+ 
++config PCIE_DW_HOTPLUG
++	bool "DesignWare PCIe Root Complex with slot hot-plug"
++	depends on OF && (ARM64 || ARM || COMPILE_TEST)
++	depends on PCI_MSI_IRQ_DOMAIN
++	select PCIE_DW_HOST
++	help
++	  Glue driver for DesignWare PCIe controllers in Root Complex mode
++	  that handles slot hot-plug in the driver itself (PRSNT# GPIO,
++	  SoC link-up/down interrupt, or link polling) instead of pciehp.
++	  Built-in only: it relies on a PCI fixup to reserve resources on
++	  the Root Port.
++
+ config PCIE_DW_PLAT_HOST
+ 	bool "Platform bus based DesignWare PCIe Controller - Host mode"
+ 	depends on PCI && PCI_MSI_IRQ_DOMAIN
+diff --git a/drivers/pci/controller/dwc/Makefile b/drivers/pci/controller/dwc/Makefile
+index a751553fa..9a77ed8cc 100644
+--- a/drivers/pci/controller/dwc/Makefile
++++ b/drivers/pci/controller/dwc/Makefile
+@@ -3,6 +3,7 @@ obj-$(CONFIG_PCIE_DW) += pcie-designware.o
+ obj-$(CONFIG_PCIE_DW_HOST) += pcie-designware-host.o
+ obj-$(CONFIG_PCIE_DW_EP) += pcie-designware-ep.o
+ obj-$(CONFIG_PCIE_DW_PLAT) += pcie-designware-plat.o
++obj-$(CONFIG_PCIE_DW_HOTPLUG) += pcie-dw-hotplug.o
+ obj-$(CONFIG_PCI_DRA7XX) += pci-dra7xx.o
+ obj-$(CONFIG_PCI_EXYNOS) += pci-exynos.o
+ obj-$(CONFIG_PCI_IMX6) += pci-imx6.o

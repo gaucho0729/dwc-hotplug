@@ -1,0 +1,38 @@
+/* DT example for pcie-dw-hotplug (adjust addresses / IRQs / GPIOs to your SoC) */
+
+pcie0: pcie@f4000000 {
+	compatible = "vendor,dw-pcie-hp";
+	device_type = "pci";
+	#address-cells = <3>;
+	#size-cells = <2>;
+
+	reg = <0x0 0xf4000000 0x0 0x1000>,	/* DWC DBI          */
+	      <0x0 0xf4100000 0x0 0x1000>,	/* SoC app (glue)   */
+	      <0x0 0x20000000 0x0 0x100000>;	/* config window    */
+	reg-names = "dbi", "app", "config";
+
+	bus-range = <0x00 0xff>;
+	ranges = <0x81000000 0x0 0x00000000 0x0 0x20100000 0x0 0x00100000>,	/* I/O  */
+		 <0x82000000 0x0 0x20200000 0x0 0x20200000 0x0 0x0fe00000>;	/* MEM  */
+
+	interrupts = <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>,	/* MSI controller   */
+		     <GIC_SPI 101 IRQ_TYPE_LEVEL_HIGH>;	/* link up/down     */
+	interrupt-names = "msi", "hp";
+
+	#interrupt-cells = <1>;
+	interrupt-map-mask = <0 0 0 7>;
+	interrupt-map = <0 0 0 1 &gic GIC_SPI 102 IRQ_TYPE_LEVEL_HIGH>,
+			<0 0 0 2 &gic GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>,
+			<0 0 0 3 &gic GIC_SPI 104 IRQ_TYPE_LEVEL_HIGH>,
+			<0 0 0 4 &gic GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
+
+	clocks = <&cru 10>, <&cru 11>;
+	resets = <&cru 20>;
+	num-lanes = <1>;
+	max-link-speed = <3>;
+	num-viewport = <8>;
+
+	reset-gpios = <&gpio1 5 GPIO_ACTIVE_LOW>;	/* PERST#  (optional) */
+	prsnt-gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;	/* PRSNT#  (optional) */
+	vpcie-supply = <&vcc3v3_pcie>;			/* slot power (optional) */
+};
